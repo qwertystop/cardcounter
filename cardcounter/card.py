@@ -1,8 +1,7 @@
-"""
-Structure for cards:
-A card is a tuple(Rank, Suit)
-"""
+"""Structure for cards"""
 from enum import Enum
+from functools import lru_cache
+from itertools import chain
 
 class Rank(Enum):
     Ace    = 1
@@ -25,6 +24,12 @@ class Suit(Enum):
     Spade   = "S"
     Diamond = "D"
 
-def full_deck():
-    return zip((r for r in Rank for n in range(4)),
-               (s for n in range(13) for s in Suit))
+@lru_cache(maxsize=2)
+def full_deck(jokers):
+    """Programmatically assemble an immutable deck, cache as necessary"""
+    base_deck = zip((r for r in Rank for n in range(4)),
+                    (s for n in range(13) for s in Suit))
+    if jokers:
+        return tuple(chain((Ellipsis, Ellipsis), base_deck))
+    else:
+        return tuple(base_deck)
