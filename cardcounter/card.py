@@ -24,3 +24,7 @@ class Suit(Enum):
     Club    = "C"
     Spade   = "S"
     Diamond = "D"
+
+def full_deck():
+    return zip((r for r in Rank for n in range(4)),
+               (s for n in range(13) for s in Suit))
