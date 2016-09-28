@@ -23,11 +23,18 @@ from cardc ounter.engine.counting_engine import odds_of
 
 def play(playerlist: Sequence[str], thisname: str) -> None:
     """
-    Main gameplay loop for 7-27. Call this to start.
+    Main gameplay loop for 7-27. Call this to start play.
     """
-
-    while True:
-        # TODO
+    tablestate = get_deal()
+    done = False
+    while not done:
+        # Keep going around the table
+        # Until nobody takes a card
+        for player in playerlist:
+            if player == thisname:
+                pass  # TODO determine whether or not to draw
+            else:
+                pass  # TODO accept input
 
 def get_deal(playerlist: Sequence[str], thisname: str) -> Dict[str, List[card.Card]]:
     """
