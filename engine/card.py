@@ -6,15 +6,15 @@ from typing import Tuple, Union
 
 class Rank(Enum):
     Ace    = "A"
-    _2     = 2
-    _3     = 3
-    _4     = 4
-    _5     = 5
-    _6     = 6
-    _7     = 7
-    _8     = 8
-    _9     = 9
-    _10    = 10
+    _2     = "2"
+    _3     = "3"
+    _4     = "4"
+    _5     = "5"
+    _6     = "6"
+    _7     = "7"
+    _8     = "8"
+    _9     = "9"
+    _10    = "10"
     Jack   = "J"
     Queen  = "Q"
     King   = "K"
@@ -26,6 +26,13 @@ class Suit(Enum):
     Diamond = "D"
 
 Card = Union[Tuple[Rank, Suit], Ellipsis]
+
+def parse_card(name: str) -> Card:
+    """Determine the card meant by a string"""
+    if name == "Joker":
+        return Ellipsis
+    else:
+        return (Rank(name[:-1]), Suit(name[-1]))
 
 @lru_cache(maxsize=2)
 def full_deck(jokers: bool) -> Tuple[Card]:
