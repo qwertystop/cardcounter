@@ -17,7 +17,7 @@ Rules of game:
         Round 3:     75¢
         Subsequent: $1.00
 """
-from typing import Dict, List, Sequence
+from typing import Dict, List, Optional, Sequence
 from cardcounter.engine import card
 from cardc ounter.engine.counting_engine import odds_of
 
@@ -25,35 +25,55 @@ def play(playerlist: Sequence[str], thisname: str) -> None:
     """
     Main gameplay loop for 7-27. Call this to start play.
     """
+
     tablestate = get_deal()
+
+    # Keep going around the table
+    # Until nobody takes a card
     done = False
     while not done:
-        # Keep going around the table
-        # Until nobody takes a card
+        done = True  # assume done each round unless someone does take
         for player in playerlist:
             if player == thisname:
                 pass  # TODO determine whether or not to draw
             else:
-                pass  # TODO accept input
+                playerdraw = get_single_draw(
+                    'What card did {} draw? "-" for no draw.'.format(player), True)
+
+            # Whoever it was, if they drew, update tablestate and this isn't the end.
+            if playerdraw is not None:
+                tablestate[player].append(playerdraw)
+                done = False
+
+        # Everyone's done, tally the hands and display the winners
+        pass  # TODO
 
 def get_deal(playerlist: Sequence[str], thisname: str) -> Dict[str, List[card.Card]]:
     """
     Get what card everyone has showing after the initial deal.
     """
 
-    prompt = 'Enter cards as rank followed by suit, e.g. "AS", "7D", "QH"'
-    print(prompt)
     tablestate = {}
     for player in playerlist:
         if player == thisname:
             message = "What card do I have? "
         else:
             message = "What card does {} have? ".format(player)
-        while True:
+        tablestate[player] = get_single_draw(message)
+    return tablestate
+
+def get_single_draw(message: str, can_pass=False : bool) -> Optional[card.Card]:
+    """
+    Get one draw from user; keep trying until user inputs something valid
+    """
+
+    prompt = 'Enter card as rank followed by suit, e.g. "AS", "7D", "QH", "10C".\n'
+    while True:
+        entry = input(message)
+        if can_pass and (entry == '-'):
+            return  # No card
+        else:
             try:  # Until they put in something valid
-                tablestate[player] = [card.parse_card(input(message))]
+                return [card.parse_card(input(message))]
             except ValueError:
                 print("Invalid card.", prompt)
-            else:  # Valid card
-                break
-    return tablestate
