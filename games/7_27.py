@@ -17,3 +17,29 @@ Rules of game:
         Round 3:     75¢
         Subsequent: $1.00
 """
+from typing import List, Mapping, Sequence
+from cardcounter.engine import card
+from cardc ounter.engine.counting_engine import odds_of
+
+def play(playerlist: Sequence[str], thisname: str) -> None:
+    """
+    Main gameplay loop for 7-27. Call this to start.
+    """
+
+    while True:
+        # TODO
+
+def get_deal(playerlist: Sequence[str], thisname: str) -> Mapping[str, List[card.Card]]:
+    """
+    Get what card everyone has showing after the initial deal.
+    """
+
+    print('Enter cards as rank followed by suit, e.g. "AS", "7D", "QH"')
+    tablestate = {}
+    for player in playerlist:
+        if player == thisname:
+            message = "What card do I have? "
+        else:
+            message = "What card does {} have? ".format(player)
+        tablestate[player] = [input(message)]
+    return tablestate
