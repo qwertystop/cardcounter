@@ -2,9 +2,9 @@
 Core system for counting cards
 """
 from card import full_deck, Card
-from typing import Iterable
+from typing import Iterable, Optional
 
-def odds_of(*, known=None: Iterable[Card], target=None: Card, joker=False: bool) -> float:
+def odds_of(*, known: Optional[Iterable[Card]]=None, target: Optional[Card]=None, joker: bool=False) -> float:
     """
     Calculate odds of a single card not in known (from standard 52- or 54-card deck) being in target
     """

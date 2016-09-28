@@ -19,7 +19,7 @@ Rules of game:
 """
 from typing import Dict, List, Optional, Sequence
 from cardcounter.engine import card
-from cardc ounter.engine.counting_engine import odds_of
+from cardcounter.engine.counting_engine import odds_of
 
 def play(playerlist: Sequence[str], thisname: str) -> None:
     """
@@ -62,7 +62,7 @@ def get_deal(playerlist: Sequence[str], thisname: str) -> Dict[str, List[card.Ca
         tablestate[player] = get_single_draw(message)
     return tablestate
 
-def get_single_draw(message: str, can_pass=False : bool) -> Optional[card.Card]:
+def get_single_draw(message: str, can_pass: bool=False) -> Optional[card.Card]:
     """
     Get one draw from user; keep trying until user inputs something valid
     """
