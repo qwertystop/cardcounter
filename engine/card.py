@@ -2,9 +2,10 @@
 from enum import Enum
 from functools import lru_cache
 from itertools import chain
+from typing import Tuple, Union
 
 class Rank(Enum):
-    Ace    = 1
+    Ace    = "A"
     _2     = 2
     _3     = 3
     _4     = 4
@@ -24,8 +25,10 @@ class Suit(Enum):
     Spade   = "S"
     Diamond = "D"
 
+Card = Union[Tuple[Rank, Suit], Ellipsis]
+
 @lru_cache(maxsize=2)
-def full_deck(jokers):
+def full_deck(jokers: bool) -> Tuple[Card]:
     """Programmatically assemble an immutable deck, cache as necessary"""
     base_deck = zip((r for r in Rank for n in range(4)),
                     (s for n in range(13) for s in Suit))
