@@ -83,7 +83,7 @@ def play(playerlist: Sequence[str], thisname: str) -> None:
 
     # Everyone's done
     redo = input("So, we're done now? Or do you want another round?\n ('y' for another round): ")
-    return redo == 'y'
+    return redo == 'y'  # TODO validate input
 
 def get_deal(playerlist: Sequence[str], thisname: str) -> Dict[str, List[card.Card]]:
     """
