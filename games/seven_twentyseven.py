@@ -35,11 +35,15 @@ def play(playerlist: Sequence[str], thisname: str) -> None:
         done = True  # assume done each round unless someone does take
         for player in playerlist:
             if player == thisname:
-                pass  # TODO determine whether or not to draw
+                # Determine whether or not to draw
+                # First, figure the odds of an improved score on a draw.
+                pass  # TODO
+                # Then, figure everyone else's likelies
+                pass  # TODO
+                #Finally, evaluate risk
             else:
                 playerdraw = get_single_draw(
                     'What card did {} draw? "-" for no draw.'.format(player), True)
-
             # Whoever it was, if they drew, update tablestate and this isn't the end.
             if playerdraw is not None:
                 tablestate[player].append(playerdraw)
@@ -50,13 +54,15 @@ def play(playerlist: Sequence[str], thisname: str) -> None:
 
 def get_deal(playerlist: Sequence[str], thisname: str) -> Dict[str, List[card.Card]]:
     """
-    Get what card everyone has showing after the initial deal.
+    Get what cards everyone has after the initial deal.
     """
 
     tablestate = {}
     for player in playerlist:
         if player == thisname:
-            message = "What card do I have? "
+            message = "What card do I have showing? "
+            tablestate[player] = get_single_draw(message)
+            message = "What card do I have hidden? "
         else:
             message = "What card does {} have? ".format(player)
         tablestate[player] = get_single_draw(message)
