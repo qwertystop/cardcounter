@@ -9,7 +9,7 @@ def get_player_info() -> Tuple[List[str], str]:
     """
     playerlist = input("Please list the names of all players,"
                       "in the order that they will take their turns.\n"
-                      "(space-separated): ").split
+                      "(space-separated): ").split()
     thisname = input("Which player is this one?\n(by name): ").strip()
     while thisname not in playerlist:
         ans = input('"{}" wasn\'t in your previous list. Add as new player, going last?\n(y/n): '

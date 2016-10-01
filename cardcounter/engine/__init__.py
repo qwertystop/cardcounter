@@ -1,5 +1,1 @@
-"""
-Scripts to determine odds of certain results.
-"""
-import card
-import counting_engine
+from cardcounter.engine import card, counting_engine, getplayers

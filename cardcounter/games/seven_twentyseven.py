@@ -41,7 +41,7 @@ def play(playerlist: Sequence[str], thisname: str) -> None:
     Main gameplay loop for 7-27. Call this to start play.
     """
 
-    tablestate = get_deal()
+    tablestate = get_deal(playerlist, thisname)
 
     # Keep going around the table
     # Until nobody takes a card
@@ -54,6 +54,7 @@ def play(playerlist: Sequence[str], thisname: str) -> None:
                 # First, figure the odds of an improved score on a draw.
                 hand_value = total_hand(tablestate[thisname])
                 (odds, score, direction) = odds_to_beat(hand_value, tablestate)
+
                 # Figure everyone else's likelihood of beating that with their current hand
                 # Naive solution, certainly not optimal even if it did predict others' draws
                 # Which it doesn't. This is big enough as is, and naive might be good enough
@@ -62,14 +63,17 @@ def play(playerlist: Sequence[str], thisname: str) -> None:
                 for other in playerlist:
                     if other != thisname:
                         other_odds.append(odds_to_beat(total_hand(tablestate[other]), tablestate,
-                                                       score, direction))
+                                                       score, direction)[0])
                 # Finally, decide whether or not it's worth it
                 if max(other_odds) > 0.7 or score == hand_value:
                     # Do not draw if someone else has a better than 70% chance
                     # or if there's no good odds of improvement anyway
                     print("I do not think I will draw a card.")
+                    playerdraw = None
                     if max(other_odds) > 0.9:
                         print("In fact, I fold.")
+                        done = True
+                        break
                 else:
                     playerdraw = get_single_draw("I will draw. What did I get?")
                 # TODO Does not account for money involved to determine acceptable odds
@@ -94,11 +98,12 @@ def get_deal(playerlist: Sequence[str], thisname: str) -> Dict[str, List[card.Ca
     for player in playerlist:
         if player == thisname:
             message = "What card do I have showing? "
-            tablestate[player] = get_single_draw(message)
+            tablestate[player] = [get_single_draw(message)]
             message = "What card do I have hidden? "
         else:
             message = "What card does {} have? ".format(player)
-        tablestate[player] = get_single_draw(message)
+            tablestate[player] = []
+        tablestate[player].append(get_single_draw(message))
     return tablestate
 
 def get_single_draw(message: str, can_pass: bool=False) -> Optional[card.Card]:
@@ -113,7 +118,7 @@ def get_single_draw(message: str, can_pass: bool=False) -> Optional[card.Card]:
             return  # No card
         else:
             try:  # Until they put in something valid
-                return [card.parse_card(input(message))]
+                return card.parse_card(entry)
             except ValueError:
                 print("Invalid card.", prompt)
 
@@ -165,31 +170,37 @@ def odds_to_beat(hand_total, tablestate, to_beat=None, direction=0):
     if to_beat == None:
         to_beat = hand_total
 
-    used_cards = [c for h in tablestate.values for c in h]
+    used_cards = [c for h in tablestate.values() for c in h]
     # Get the odds for drawing each rank
     rank_odds = {r: odds_by_rank(known=used_cards, targetrank=r, joker=False)
                 for r in card.Rank}
+
     # Convert that to odds of any given value
-    score_odds = defaultdict(int)
+    total_odds = defaultdict(int)
     for r in card.Rank:
         if r == card.Rank.Ace:
-            score = branch_value_by_aces(hand_total, 1)
+            total = branch_value_by_aces(hand_total, 1)
         else:
-            score = branch_value_by_aces(hand_total + POINT_VALUES[r], 0)
-        score_odds[score] += rank_odds[int]
+            total = branch_value_by_aces(hand_total + POINT_VALUES[r], 0)
+        total_odds[total] += rank_odds[r]
+
     # Filter out the ones that are too low
-    for score, _ in score_odds:
+    target = rate_score(to_beat, direction)
+    for score in list(filter((lambda s: rate_score(s, direction) < target), total_odds)):
         if rate_score(score, direction)[0] < rate_score(to_beat, direction)[0]:
-            del score_odds[score]
+            del total_odds[score]
+
     # Sort the rest by how good they are, and sum their odds
-    scores = sorted(score_odds.keys, key=lambda x: rate_score(x, direction)[0])
-    answer = sum(score_odds.values)
+    scores = sorted(total_odds.keys(), key=lambda x: rate_score(x, direction)[0])
+    answer = sum(total_odds.values())
     running_odds = 0.0
+
     for s in scores:
-        running_odds = score_odds[s]
+        running_odds += total_odds[s]
         if running_odds > 0.6:
             sixty_percent = s
             break
     else:  # No break, nothing likely
         sixty_percent = hand_total  # reliable odds are to stay
+
     return answer, sixty_percent, rate_score(sixty_percent, direction)[1]
